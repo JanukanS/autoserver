@@ -1,0 +1,14 @@
+<form>
+    {% for rowData in formRows %}
+        <label for="{{ rowData.varName }}">{{ rowData.varName }}</label>
+        {% if rowData.varType == 'str' %}
+            <input type="text" id="{{ rowData.varName }}" name="{{  rowData.varName }}"><br>
+        {%  elif rowData.varType == 'int' %}
+            <input type="number" step=1 id="{{ rowData.varName }}" name="{{  rowData.varName }}"><br>
+        {% elif rowData.varType == 'float' %}
+            <input type="number" step=0.0000000001 id="{{ rowData.varName }}" name="{{  rowData.varName }}"><br>
+        {% else %}
+            rowData.varType
+        {% endif %}
+    {%  endfor %}
+</form>
