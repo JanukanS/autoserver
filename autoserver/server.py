@@ -5,6 +5,7 @@ import jinja2
 import pathlib
 import inspect
 import collections
+import pydantic
 
 class TemplateBase():
     jinjaPath = pathlib.Path(__file__).resolve().parent / 'resources/'
@@ -23,6 +24,7 @@ class funcData(TemplateBase):
         self.backEndPoint = f"/back/{newfunc.__name__}"
         self.form = self.createForm(newfunc)
         self.frontpage = self.frontfunc.render(funcForm=self.form)
+        self.model = self.createModel(newfunc)
 
     @classmethod
     def inputTypeDict(cls, newfunc):
@@ -36,6 +38,12 @@ class funcData(TemplateBase):
         typeDict = cls.inputTypeDict(newfunc)
         formData = [cls.formDatum(argVal, typeDict[argVal].__name__) for argVal in typeDict]
         return cls.baseform.render(formRows=formData)
+
+    @classmethod
+    def createModel(cls, newfunc):
+        typeDict = cls.inputTypeDict(newfunc)
+        modelTypeDict = {varName: (typeDict[varName], ...) for varName in typeDict}
+        return pydantic.create_model(f"{newfunc.__name__}_model", **modelTypeDict)
 
 
 
@@ -54,6 +62,10 @@ class AutoServer(TemplateBase):
         def show_page():
             return fData.frontpage
 
+        @self.app.post(fData.backEndPoint, response_class=fastapi.responses.HTMLResponse)
+        def back_endpoint(inputData: fData.model):
+            return newfunc(**inputData.__dict__)
+
         return newfunc
 
     def run(self):
@@ -70,11 +82,8 @@ if __name__ == "__main__":
     app = AutoServer()
 
     @app.addfunc
-    def testfunc1(arg1, arg2: int, arg3: float):
-        pass
-
-    x=funcData(testfunc1)
-    print(x.frontpage)
+    def testfunc1(name:str, quantity: int, cost:float):
+        return f"Ordering {quantity} {name} for ${quantity*cost}"
 
     app.run()
 
