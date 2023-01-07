@@ -37,7 +37,8 @@ class funcData(TemplateBase):
     def createForm(cls, newfunc):
         typeDict = cls.inputTypeDict(newfunc)
         formData = [cls.formDatum(argVal, typeDict[argVal].__name__) for argVal in typeDict]
-        return cls.baseform.render(formRows=formData)
+        return cls.baseform.render(formRows=formData,
+                                   backEndPoint=f"/back/{newfunc.__name__}")
 
     @classmethod
     def createModel(cls, newfunc):
@@ -62,7 +63,7 @@ class AutoServer(TemplateBase):
         def show_page():
             return fData.frontpage
 
-        @self.app.post(fData.backEndPoint, response_class=fastapi.responses.HTMLResponse)
+        @self.app.post(fData.backEndPoint)
         def back_endpoint(inputData: fData.model):
             return newfunc(**inputData.__dict__)
 
