@@ -11,6 +11,7 @@ class TemplateBase():
     jinjaEnv = jinja2.Environment(loader=jinja2.FileSystemLoader(jinjaPath))
     homepage = jinjaEnv.get_template("homepage.html.jinja2")
     baseform = jinjaEnv.get_template("baseform.html.jinja2")
+    frontfunc = jinjaEnv.get_template("frontfunc.html.jinja2")
 
 class funcData(TemplateBase):
     formDatum = collections.namedtuple("formDatum", "varName varType")
@@ -18,6 +19,10 @@ class funcData(TemplateBase):
         self.fn = newfunc
         self.name = newfunc.__name__
         self.typeDict = self.inputTypeDict(newfunc)
+        self.frontEndPoint = f"/front/{newfunc.__name__}"
+        self.backEndPoint = f"/back/{newfunc.__name__}"
+        self.form = self.createForm(newfunc)
+        self.frontpage = self.frontfunc.render(funcForm=self.form)
 
     @classmethod
     def inputTypeDict(cls, newfunc):
@@ -35,13 +40,20 @@ class funcData(TemplateBase):
 
 
 
+
 class AutoServer(TemplateBase):
     def __init__(self):
         self.app = FastAPI()
         self.funcDataList = []
 
     def addfunc(self, newfunc):
-        self.funcDataList.append(funcData(newfunc))
+        fData = funcData(newfunc)
+        self.funcDataList.append(fData)
+
+        @self.app.get(fData.frontEndPoint, response_class=fastapi.responses.HTMLResponse)
+        def show_page():
+            return fData.frontpage
+
         return newfunc
 
     def run(self):
@@ -61,8 +73,8 @@ if __name__ == "__main__":
     def testfunc1(arg1, arg2: int, arg3: float):
         pass
 
-    x=funcData.createForm(testfunc1)
-    print(x)
+    x=funcData(testfunc1)
+    print(x.frontpage)
 
     app.run()
 

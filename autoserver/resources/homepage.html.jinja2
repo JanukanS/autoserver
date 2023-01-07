@@ -7,7 +7,7 @@
 Functions Available:
 <ul>
     {% for fn in fnList %}
-        <li>{{ fn.name }}</li>
+        <li><a href="{{ fn.frontEndPoint }}">{{ fn.name }}</a></li>
     {% endfor %}
 </ul>
 </body>
