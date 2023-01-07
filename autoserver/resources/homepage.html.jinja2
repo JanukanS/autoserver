@@ -1,0 +1,14 @@
+<html>
+<head>
+
+</head>
+<body>
+<h1>Welcome to AutoServer</h1>
+Functions Available:
+<ul>
+    {% for fn in fnList %}
+        <li>{{ fn.__name__ }}</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
