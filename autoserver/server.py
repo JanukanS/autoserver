@@ -6,6 +6,7 @@ import pathlib
 import inspect
 import collections
 import pydantic
+import docstring_parser
 
 class TemplateBase():
     jinjaPath = pathlib.Path(__file__).resolve().parent / 'resources/'
@@ -17,11 +18,13 @@ class funcData(TemplateBase):
     formDatum = collections.namedtuple("formDatum", "varName varType")
     def __init__(self, newfunc):
         self.fn = newfunc
+        docdata = docstring_parser.parse(newfunc.__doc__)
         self.name = newfunc.__name__
+        self.desc = docdata.short_description
+        self.paramDesc = {param.arg_name: param.description for param in docdata.params }
         self.typeDict = self.inputTypeDict(newfunc)
         self.frontEndPoint = f"/front/{newfunc.__name__}"
         self.backEndPoint = f"/back/{newfunc.__name__}"
-        self.frontpage = self.createFrontEnd(newfunc)
         self.model = self.createModel(newfunc)
 
     @classmethod
@@ -31,12 +34,10 @@ class funcData(TemplateBase):
         typeDict = argData.annotations
         return {argVal: typeDict.get(argVal, str) for argVal in argList}
 
-    @classmethod
-    def createFrontEnd(cls, newfunc):
-        typeDict = cls.inputTypeDict(newfunc)
-        formData = [cls.formDatum(argVal, typeDict[argVal].__name__) for argVal in typeDict]
-        return cls.frontfunc.render(formRows=formData,
-                                   backEndPoint=f"/back/{newfunc.__name__}")
+    def createFrontEnd(self):
+        formData = [self.formDatum(argVal, self.typeDict[argVal].__name__) for argVal in self.typeDict]
+        return self.frontfunc.render(fnObj = self,
+                                     formRows=formData)
 
     @classmethod
     def createModel(cls, newfunc):
@@ -57,9 +58,10 @@ class AutoServer(TemplateBase):
         fData = funcData(newfunc)
         self.funcDataList.append(fData)
 
+        webpage = fData.createFrontEnd()
         @self.app.get(fData.frontEndPoint, response_class=fastapi.responses.HTMLResponse)
         def show_page():
-            return fData.frontpage
+            return webpage
 
         @self.app.post(fData.backEndPoint)
         def back_endpoint(inputData: fData.model):
@@ -82,6 +84,13 @@ if __name__ == "__main__":
 
     @app.addfunc
     def TaxCalc(province:str, cost: float, taxrate:int):
+        """
+        Computes the amount of tax on an item given the tax rate
+        :param province: The name of the province
+        :param cost: The cost of the item expressed in dollars
+        :param taxrate: The tax rate expressed as a percentage
+        :return:
+        """
         tax = cost*float(taxrate)/100
         output = f"The tax in {province} for an item worth ${cost} is {tax}."
         output += f"The total cost is ${cost + tax}."

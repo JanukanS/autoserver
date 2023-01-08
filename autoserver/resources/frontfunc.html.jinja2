@@ -1,5 +1,6 @@
 <html>
 <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
 <script>
     function submitForm() {
         const form = document.getElementById('sampleForm');
@@ -9,7 +10,7 @@
         for (const [key, value] of formData.entries()) {
             data[key] = value;
         }
-        fetch('{{ backEndPoint }}', {
+        fetch('{{ fnObj.backEndPoint }}', {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {
@@ -22,6 +23,13 @@
 </script>
 </head>
 <body>
+<h1>{{ fnObj.name }}</h1>
+<p>{{ fnObj.desc }}</p>
+<ul>
+    {% for key, value in fnObj.paramDesc.items() %}
+        <li><b>{{ key }}:</b>{{ value }}</li>
+    {% endfor %}
+</ul>
 <form id="sampleForm" onsubmit="submitForm()" action="javascript:void(0);">
     {% for rowData in formRows %}
         <label for="{{ rowData.varName }}">{{ rowData.varName }}</label>
