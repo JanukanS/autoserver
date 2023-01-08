@@ -83,8 +83,18 @@ if __name__ == "__main__":
     app = AutoServer()
 
     @app.addfunc
-    def testfunc1(name:str, quantity: int, cost:float):
-        return f"Ordering {quantity} {name} for ${quantity*cost}"
+    def TaxCalc(province:str, cost: float, taxrate:int):
+        tax = cost*float(taxrate)/100
+        output = f"The tax in {province} for an item worth ${cost} is {tax}."
+        output += f"The total cost is ${cost + tax}."
+        return output
+
+    @app.addfunc
+    def TargetPrice(province: str, targetcost: float, taxrate:int):
+        targetRatio = 1.0 + float(taxrate)/100
+        output = f"To have a final cost of ${targetcost} in {province},"
+        output += f"the pretax price should be ${targetcost/targetRatio}"
+        return output
 
     app.run()
 
