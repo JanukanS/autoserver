@@ -6,31 +6,84 @@ AutoServer is available on the python package index (PyPI) and can be installed 
 ```bash
 pip install autoserver
 ```
+## Features
+- Able to create a form for arguments that are either strings, floats or integers
+- Display documentation from RST style docstrings (similar to sphinx)
 ## Example
+We will start with just the functions. This library is able to work on functions with type hinted input parameters and RST style docstrings. Without the type hints, all arguments are assumed to be strings and documentation cannot be displayed without the docstring. 
+```python
+def deltaWavelength(colour: str, index1: float, index2: float):
+    """
+    Compute the change in wavelength due to a change in optical index
+    :param colour: Any one of 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'
+    :param index1: The initial optical index
+    :param index2: The final optical index
+    :return:
+    """
+    wlenDict = {
+        "red": 700.0,
+        "orange": 620.0,
+        "yellow": 580.0,
+        "green": 532.0,
+        "blue": 500.0,
+        "indigo": 450.0,
+        "violet": 400.0,
+    }
+    wlen = wlenDict.get(colour, None)
+    if wlen:
+        return f"The change in wavelength is {wlen*(1/index2-1/index1)} nm."
+    else:
+        return "Error"
+
+def computeFrequency(wlen: float, index: float):
+    """
+    Compute the frequency for a given wavelength within an optical medium
+    :param wlen: Wavelength expressed in nm
+    :param index: Optical Index
+    :return:
+    """
+    freq = 3E8/(index*wlen*1e-9)
+    return f"Frequency of light would be {freq:e} Hz."
+```
+To use autoserver, we need to import it. Then we initialize the server object. Functions can be added to the server through the use of the decorator. Finally the server must be run. 
 ```python
 from autoserver import AutoServer
 app = AutoServer()
 
 @app.addfunc
-def TaxCalc(province: str, cost: float, taxrate: int):
+def deltaWavelength(colour: str, index1: float, index2: float):
     """
-    Computes the amount of tax on an item given the tax rate
-    :param province: The name of the province
-    :param cost: The cost of the item expressed in dollars
-    :param taxrate: The tax rate expressed as a percentage
+    Compute the change in wavelength due to a change in optical index
+    :param colour: Any one of 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'
+    :param index1: The initial optical index
+    :param index2: The final optical index
     :return:
     """
-    tax = cost * float(taxrate) / 100
-    output = f"The tax in {province} for an item worth ${cost} is {tax}."
-    output += f"The total cost is ${cost + tax}."
-    return output
+    wlenDict = {
+        "red": 700.0,
+        "orange": 620.0,
+        "yellow": 580.0,
+        "green": 532.0,
+        "blue": 500.0,
+        "indigo": 450.0,
+        "violet": 400.0,
+    }
+    wlen = wlenDict.get(colour, None)
+    if wlen:
+        return f"The change in wavelength is {wlen*(1/index2-1/index1)} nm."
+    else:
+        return "Error"
 
 @app.addfunc
-def TargetPrice(province: str, targetcost: float, taxrate: int):
-    targetRatio = 1.0 + float(taxrate) / 100
-    output = f"To have a final cost of ${targetcost} in {province},"
-    output += f"the pretax price should be ${targetcost / targetRatio}"
-    return output
+def computeFrequency(wlen: float, index: float):
+    """
+    Compute the frequency for a given wavelength within an optical medium
+    :param wlen: Wavelength expressed in nm
+    :param index: Optical Index
+    :return:
+    """
+    freq = 3E8/(index*wlen*1e-9)
+    return f"Frequency of light would be {freq:e} Hz."
 
 app.run()
 ```
