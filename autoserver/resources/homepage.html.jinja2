@@ -1,11 +1,26 @@
 <html>
 <head>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+<link rel="stylesheet" href="https://raj457036.github.io/attriCSS//themes/midnight-green.css">
 </head>
 <body>
-<h1>Welcome to AutoServer</h1>
+<nav>
+    <header>
+        <a href="/">AutoServer</a>
+        <label for="nav"><i class="fas fa-bars"></i></label>
+    </header>
+    <input type="checkbox" id="nav" hidden checked>
+    <div overflow>
+        <ul>
+            {%  for fn in fnList %}
+            <li><a href="{{ fn.frontEndPoint }}">{{ fn.name }}</li>
+            {% endfor %}
+            <li><a href="/">Home</a></li>
+        </ul>
+    </div>
+</nav>
+<h1 style="text-align:center">Welcome to AutoServer</h1>
 <hr>
-<table>
+<table style="margin: auto;">
     <tr>
         <th>Function</th>
         <th>Description</th>

@@ -34,9 +34,10 @@ class funcData(TemplateBase):
         typeDict = argData.annotations
         return {argVal: typeDict.get(argVal, str) for argVal in argList}
 
-    def createFrontEnd(self):
+    def createFrontEnd(self, fnObjList):
         formData = [self.formDatum(argVal, self.typeDict[argVal].__name__) for argVal in self.typeDict]
-        return self.frontfunc.render(fnObj = self,
+        return self.frontfunc.render(fnList = fnObjList,
+                                     fnObj = self,
                                      formRows=formData)
 
     @classmethod
@@ -58,10 +59,10 @@ class AutoServer(TemplateBase):
         fData = funcData(newfunc)
         self.funcDataList.append(fData)
 
-        webpage = fData.createFrontEnd()
+        #webpage = fData.createFrontEnd(self.funcDataList)
         @self.app.get(fData.frontEndPoint, response_class=fastapi.responses.HTMLResponse)
         def show_page():
-            return webpage
+            return fData.createFrontEnd(self.funcDataList)
 
         @self.app.post(fData.backEndPoint)
         def back_endpoint(inputData: fData.model):
