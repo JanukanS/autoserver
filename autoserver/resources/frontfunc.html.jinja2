@@ -25,11 +25,18 @@
 <body>
 <h1>{{ fnObj.name }}</h1>
 <p>{{ fnObj.desc }}</p>
-<ul>
+<table>
+    <tr>
+        <th>Parameter</th>
+        <th>Description</th>
+    </tr>
     {% for key, value in fnObj.paramDesc.items() %}
-        <li><b>{{ key }}:</b>{{ value }}</li>
+        <tr>
+        <th>{{ key }}</th>
+        <th>{{ value }}</th>
+        </tr>
     {% endfor %}
-</ul>
+</table>
 <form id="sampleForm" onsubmit="submitForm()" action="javascript:void(0);">
     {% for rowData in formRows %}
         <label for="{{ rowData.varName }}">{{ rowData.varName }}</label>

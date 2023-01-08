@@ -4,11 +4,17 @@
 </head>
 <body>
 <h1>Welcome to AutoServer</h1>
-Functions Available:
-<ul>
+<table>
+    <tr>
+        <th>Function</th>
+        <th>Description</th>
+    </tr>
     {% for fn in fnList %}
-        <li><a href="{{ fn.frontEndPoint }}"><b>{{ fn.name }}:</b></a> {{ fn.desc }} </li>
+        <tr>
+            <th><a href="{{ fn.frontEndPoint }}">{{ fn.name }}</a></th>
+            <th>{{ fn.desc }}</th>
+        </tr>
     {% endfor %}
-</ul>
+</table>
 </body>
 </html>
