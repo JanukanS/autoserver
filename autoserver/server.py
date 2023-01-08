@@ -11,7 +11,6 @@ class TemplateBase():
     jinjaPath = pathlib.Path(__file__).resolve().parent / 'resources/'
     jinjaEnv = jinja2.Environment(loader=jinja2.FileSystemLoader(jinjaPath))
     homepage = jinjaEnv.get_template("homepage.html.jinja2")
-    baseform = jinjaEnv.get_template("baseform.html.jinja2")
     frontfunc = jinjaEnv.get_template("frontfunc.html.jinja2")
 
 class funcData(TemplateBase):
@@ -22,8 +21,7 @@ class funcData(TemplateBase):
         self.typeDict = self.inputTypeDict(newfunc)
         self.frontEndPoint = f"/front/{newfunc.__name__}"
         self.backEndPoint = f"/back/{newfunc.__name__}"
-        self.form = self.createForm(newfunc)
-        self.frontpage = self.frontfunc.render(funcForm=self.form)
+        self.frontpage = self.createFrontEnd(newfunc)
         self.model = self.createModel(newfunc)
 
     @classmethod
@@ -34,10 +32,10 @@ class funcData(TemplateBase):
         return {argVal: typeDict.get(argVal, str) for argVal in argList}
 
     @classmethod
-    def createForm(cls, newfunc):
+    def createFrontEnd(cls, newfunc):
         typeDict = cls.inputTypeDict(newfunc)
         formData = [cls.formDatum(argVal, typeDict[argVal].__name__) for argVal in typeDict]
-        return cls.baseform.render(formRows=formData,
+        return cls.frontfunc.render(formRows=formData,
                                    backEndPoint=f"/back/{newfunc.__name__}")
 
     @classmethod

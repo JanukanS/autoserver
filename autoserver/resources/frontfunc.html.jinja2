@@ -1,8 +1,43 @@
 <html>
 <head>
+<script>
+    function submitForm() {
+        const form = document.getElementById('sampleForm');
+        const formData = new FormData(form);
+        const outputSection = document.getElementById('response')
+        const data = {};
+        for (const [key, value] of formData.entries()) {
+            data[key] = value;
+        }
+        fetch('{{ backEndPoint }}', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => response.json())
+            .then((data) => outputSection.innerHTML = data);
 
+    }
+</script>
 </head>
 <body>
-{{ funcForm }}
+<form id="sampleForm" onsubmit="submitForm()" action="javascript:void(0);">
+    {% for rowData in formRows %}
+        <label for="{{ rowData.varName }}">{{ rowData.varName }}</label>
+        {% if rowData.varType == 'str' %}
+            <input type="text" id="{{ rowData.varName }}" name="{{  rowData.varName }}"><br>
+        {%  elif rowData.varType == 'int' %}
+            <input type="number" step=1 id="{{ rowData.varName }}" name="{{  rowData.varName }}"><br>
+        {% elif rowData.varType == 'float' %}
+            <input type="number" step=0.0000000001 id="{{ rowData.varName }}" name="{{  rowData.varName }}"><br>
+        {% else %}
+            rowData.varType
+        {% endif %}
+    {%  endfor %}
+    <input type="submit" value="Submit">
+</form>
+<div id="response">
+</div>
 </body>
 </html>
