@@ -69,7 +69,7 @@ class AutoServer(TemplateBase):
 
     def run(self):
         @self.app.get("/",response_class=fastapi.responses.HTMLResponse)
-        def read_root():
+        def homepage():
             return self.homepage.render(fnList=self.funcDataList)
 
         uvicorn.run(self.app,
