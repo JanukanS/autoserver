@@ -25,6 +25,7 @@
 <body>
 <h1>{{ fnObj.name }}</h1>
 <p>{{ fnObj.desc }}</p>
+<hr>
 <table>
     <tr>
         <th>Parameter</th>
@@ -37,6 +38,7 @@
         </tr>
     {% endfor %}
 </table>
+<hr>
 <form id="sampleForm" onsubmit="submitForm()" action="javascript:void(0);">
     {% for rowData in formRows %}
         <label for="{{ rowData.varName }}">{{ rowData.varName }}</label>
